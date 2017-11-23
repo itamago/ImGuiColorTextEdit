@@ -10,6 +10,8 @@
 #include <regex>
 #include "imgui.h"
 
+namespace ImGui {
+
 class TextEditor
 {
 public:
@@ -309,4 +311,6 @@ private:
 	ImVec2 mCharAdvance;
 	Coordinates mInteractiveStart, mInteractiveEnd;
 };
+
+}  // namespace ImGui
 
