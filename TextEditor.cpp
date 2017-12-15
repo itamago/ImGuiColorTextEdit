@@ -1239,20 +1239,20 @@ void TextEditor::Redo(int aSteps)
 
 const TextEditor::Palette & TextEditor::GetDarkPalette()
 {
-	static Palette p = { 
-		0xffffffff,	// None
-		0xffd69c56,	// Keyword	
-		0xff00ff00,	// Number
-		0xff7070e0,	// String
+	static Palette p = {
+		0xffe2e9e9,	// None
+		0xffcc9966,	// Keyword
+		0xff57adf9,	// Number
+		0xff94c799,	// String
 		0xff70a0e0, // Char literal
-		0xffffffff, // Punctuation
-		0xff409090,	// Preprocessor
-		0xffaaaaaa, // Identifier
+		0xffdcdcdc, // Punctuation
+		0xffa98bc2,	// Preprocessor
+		0xffe2e9e9, // Identifier
 		0xff9bc64d, // Known identifier
 		0xffc040a0, // Preproc identifier
-		0xff206020, // Comment (single line)
-		0xff406020, // Comment (multi line)
-		0xff101010, // Background
+		0xff9d9d9d, // Comment (single line)
+		0xff9d9d9d, // Comment (multi line)
+		0xff463d34, // Background
 		0xffe0e0e0, // Cursor
 		0x80a06020, // Selection
 		0x800020ff, // ErrorMarker
