@@ -535,8 +535,6 @@ void TextEditor::Render(const char* aTitle, const ImVec2& aSize, bool aBorder)
 				drawList->AddRectFilled(vstart, vend, mPalette[(int)PaletteIndex::Selection]);
 			}
 
-			static char buf[16];
-
 			if (mBreakpoints.find(lineNo + 1) != mBreakpoints.end())
 			{
 				auto end = ImVec2(lineStartScreenPos.x + contentSize.x, lineStartScreenPos.y + mCharAdvance.y);
@@ -563,6 +561,7 @@ void TextEditor::Render(const char* aTitle, const ImVec2& aSize, bool aBorder)
 				}
 			}
 
+			char buf[16];
 			snprintf(buf, 16, "%6d", lineNo + 1);
 			drawList->AddText(ImVec2(lineStartScreenPos.x /*+ mCharAdvance.x * 1*/, lineStartScreenPos.y), mPalette[(int)PaletteIndex::LineNumber], buf);
 
