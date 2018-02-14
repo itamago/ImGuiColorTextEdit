@@ -149,6 +149,7 @@ public:
 		bool mCaseSensitive;
 
 		static LanguageDefinition CPlusPlus();
+		static LanguageDefinition Metal();
 		static LanguageDefinition HLSL();
 		static LanguageDefinition GLSL();
 		static LanguageDefinition C();

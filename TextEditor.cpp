@@ -1632,6 +1632,71 @@ TextEditor::LanguageDefinition TextEditor::LanguageDefinition::CPlusPlus()
 	return langDef;
 }
 
+TextEditor::LanguageDefinition TextEditor::LanguageDefinition::Metal()
+{
+	static bool inited = false;
+	static LanguageDefinition langDef;
+	if (!inited)
+	{
+		static const char* const keywords[] = {
+			"asm", "asm_fragment", "BlendState", "bool", "break", "case", "class",
+			"const", "constant", "device", "using", "continue", "default", "discard", "do", "double", "DomainShader", "else",
+			"export", "extern", "false", "true", "float", "for", "half", "if", "in", "inline", "inout", "InputPatch", "int",
+			"simd", "namespace", "NULL", "out",
+			"return", "register", "sampler", "shared", "snorm",
+			"static", "string", "struct", "switch", "texture",
+			"typedef", "uint", "uniform", "unorm", "unsigned",
+			"void", "volatile", "while",
+			"bool1","bool2","bool3","bool4","double1","double2","double3","double4", "float1", "float2", "float3", "float4", "int1", "int2", "int3", "int4", "in", "out", "inout",
+			"uint1", "uint2", "uint3", "uint4", "dword1", "dword2", "dword3", "dword4", "half1", "half2", "half3", "half4",
+			"float1x1","float2x1","float3x1","float4x1","float1x2","float2x2","float3x2","float4x2",
+			"float1x3","float2x3","float3x3","float4x3","float1x4","float2x4","float3x4","float4x4",
+			"half1x1","half2x1","half3x1","half4x1","half1x2","half2x2","half3x2","half4x2",
+			"half1x3","half2x3","half3x3","half4x3","half1x4","half2x4","half3x4","half4x4",
+			"buffer", "stage_in", "instance_id", "vertex_id", "texture2d", "access", "early_fragment_tests",
+			"enum",
+		};
+		for (auto& k : keywords)
+			langDef.mKeywords.insert(k);
+
+		static const char* const identifiers[] = {
+			"abort", "abs", "acos", "all", "any", "atan", "atan2", "ceil", "clamp", "clip", "cos", "cosh", "countbits", "cross", "ddx",
+			"ddx_coarse", "ddx_fine", "ddy", "ddy_coarse", "ddy_fine", "degrees", "determinant", "distance", "dot", "exp", "exp2",
+			"floor", "fma", "fmod", "frac", "frexp", "fwidth", "isfinite", "isinf", "isnan",
+			"ldexp", "length", "lerp", "lit", "log", "log10", "log2", "mad", "max", "min", "modf", "msad4", "mul", "noise", "normalize", "pow",
+			"radians", "rcp", "reflect", "refract", "reversebits", "round", "rsqrt", "saturate", "sign", "sin", "sincos", "sinh", "smoothstep", "sqrt", "step",
+			"tan", "tanh", "transpose", "trunc", "sample", "mix",
+		};
+		for (auto& k : identifiers)
+		{
+			Identifier id;
+			id.mDeclaration = "Built-in function";
+			langDef.mIdentifiers.insert(std::make_pair(std::string(k), id));
+		}
+
+		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("//.*", PaletteIndex::Comment));
+		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[ \t]*#[ \\t]*[a-zA-Z_]+", PaletteIndex::Preprocessor));
+		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("L?\\\"(\\\\.|[^\\\"])*\\\"", PaletteIndex::String));
+		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("\\'\\\\?[^\\']\\'", PaletteIndex::CharLiteral));
+		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?[fF]?", PaletteIndex::Number));
+		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[+-]?[0-9]+[Uu]?[lL]?[lL]?", PaletteIndex::Number));
+		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("0[0-7]+[Uu]?[lL]?[lL]?", PaletteIndex::Number));
+		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("0[xX][0-9a-fA-F]+[uU]?[lL]?[lL]?", PaletteIndex::Number));
+		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[a-zA-Z_][a-zA-Z0-9_]*", PaletteIndex::Identifier));
+		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[\\[\\]\\{\\}\\!\\%\\^\\&\\*\\(\\)\\-\\+\\=\\~\\|\\<\\>\\?\\/\\;\\,\\.]", PaletteIndex::Punctuation));
+
+		langDef.mCommentStart = "/*";
+		langDef.mCommentEnd = "*/";
+
+		langDef.mCaseSensitive = true;
+
+		langDef.mName = "HLSL";
+
+		inited = true;
+	}
+	return langDef;
+}
+
 TextEditor::LanguageDefinition TextEditor::LanguageDefinition::HLSL()
 {
 	static bool inited = false;
