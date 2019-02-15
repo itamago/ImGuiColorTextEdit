@@ -396,12 +396,12 @@ void TextEditor::Render(const char* aTitle, const ImVec2& aSize, bool aBorder)
 			ImGui::SetMouseCursor(ImGuiMouseCursor_TextInput);
 		//ImGui::CaptureKeyboardFromApp(true);
 
-		if ((super || ctrl) && !shift && !alt && ImGui::IsKeyPressed(int(EaseFX::KeyCode::Z)))
+		if ((super || ctrl) && !shift && !alt && ImGui::IsKeyPressed(int(ease::KeyCode::Z)))
 			if (ctrl && !shift && !alt)
 				Undo();
 		if (!ctrl && !shift && alt && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Backspace)))
 				Undo();
-		if ((super || ctrl) && !shift && !alt && ImGui::IsKeyPressed(int(EaseFX::KeyCode::Y)))
+		if ((super || ctrl) && !shift && !alt && ImGui::IsKeyPressed(int(ease::KeyCode::Y)))
 			Redo();
 
 		if (!ctrl && !alt && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
@@ -436,11 +436,11 @@ void TextEditor::Render(const char* aTitle, const ImVec2& aSize, bool aBorder)
 			BackSpace();
 		else if (!ctrl && !shift && !alt && ImGui::IsKeyPressed(45))
 			mOverwrite ^= true;
-		else if ((super || ctrl) && !shift && !alt && ImGui::IsKeyPressed(int(EaseFX::KeyCode::C)))
+		else if ((super || ctrl) && !shift && !alt && ImGui::IsKeyPressed(int(ease::KeyCode::C)))
 			Copy();
-		else if ((super || ctrl) && !shift && !alt && ImGui::IsKeyPressed(int(EaseFX::KeyCode::V)))
+		else if ((super || ctrl) && !shift && !alt && ImGui::IsKeyPressed(int(ease::KeyCode::V)))
 			Paste();
-		else if ((super || ctrl) && !shift && !alt && ImGui::IsKeyPressed(int(EaseFX::KeyCode::X)))
+		else if ((super || ctrl) && !shift && !alt && ImGui::IsKeyPressed(int(ease::KeyCode::X)))
 			Cut();
 
 		if (!IsReadOnly())
