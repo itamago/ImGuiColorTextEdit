@@ -389,3 +389,6 @@ private:
 
 	float mLastClick;
 };
+
+
+} // namespace ImGui
