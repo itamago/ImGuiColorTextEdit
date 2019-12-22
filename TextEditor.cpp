@@ -49,7 +49,7 @@ TextEditor::TextEditor()
 	, mStartTime(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count())
 {
 	SetPalette(GetDarkPalette());
-	SetLanguageDefinition(LanguageDefinition::HLSL());
+	SetLanguageDefinition(LanguageDefinition::Metal());
 	mLines.push_back(Line());
 }
 
@@ -75,39 +75,58 @@ void TextEditor::SetPalette(const Palette & aValue)
 
 std::string TextEditor::GetText(const Coordinates & aStart, const Coordinates & aEnd) const
 {
-	std::string result;
+    std::string result;
 
-	auto lstart = aStart.mLine;
-	auto lend = aEnd.mLine;
-	auto istart = GetCharacterIndex(aStart);
-	auto iend = GetCharacterIndex(aEnd);
-	size_t s = 0;
+    int prevLineNo = aStart.mLine;
+    for (auto it = aStart; it <= aEnd; Advance(it))
+    {
+        if (prevLineNo != it.mLine && it.mLine < (int) mLines.size())
+            result.push_back('\n');
 
-	for (size_t i = lstart; i < lend; i++)
-		s += mLines[i].size();
+        if (it == aEnd)
+            break;
 
-	result.reserve(s + s / 8);
+        prevLineNo = it.mLine;
+        const auto& line = mLines[it.mLine];
+        if (!line.empty() && it.mColumn < (int)line.size())
+            result.push_back(line[it.mColumn].mChar);
+    }
 
-	while (istart < iend || lstart < lend)
-	{
-		if (lstart >= (int)mLines.size())
-			break;
+    return result;
 
-		auto& line = mLines[lstart];
-		if (istart < (int)line.size())
-		{
-			result += line[istart].mChar;
-			istart++;
-		}
-		else
-		{
-			istart = 0;
-			++lstart;
-			result += '\n';
-		}
-	}
-
-	return result;
+//	std::string result;
+//
+//	auto lstart = aStart.mLine;
+//	auto lend = aEnd.mLine;
+//	auto istart = GetCharacterIndex(aStart);
+//	auto iend = GetCharacterIndex(aEnd);
+//	size_t s = 0;
+//
+//	for (size_t i = lstart; i < lend; i++)
+//		s += mLines[i].size();
+//
+//	result.reserve(s + s / 8);
+//
+//	while (istart < iend || lstart < lend)
+//	{
+//		if (lstart >= (int)mLines.size())
+//			break;
+//
+//		auto& line = mLines[lstart];
+//		if (istart < (int)line.size())
+//		{
+//			result += line[istart].mChar;
+//			istart++;
+//		}
+//		else
+//		{
+//			istart = 0;
+//			++lstart;
+//			result += '\n';
+//		}
+//	}
+//
+//	return result;
 }
 
 TextEditor::Coordinates TextEditor::GetActualCursorCoordinates() const
@@ -1154,29 +1173,29 @@ void TextEditor::Render(const char* aTitle, const ImVec2& aSize, bool aBorder)
 
 void TextEditor::SetText(const std::string & aText)
 {
-	mLines.clear();
-	mLines.emplace_back(Line());
-	for (auto chr : aText)
-	{
-		if (chr == '\r')
-		{
-			// ignore the carriage return character
-		}
-		else if (chr == '\n')
-			mLines.emplace_back(Line());
-		else
-		{
-			mLines.back().emplace_back(Glyph(chr, PaletteIndex::Default));
-		}
-	}
+    mLines.clear();
+    mLines.emplace_back(Line());
+    for (auto chr : aText)
+    {
+        if (chr == '\r')
+        {
+            // ignore the carriage return character
+        }
+        else if (chr == '\n')
+            mLines.emplace_back(Line());
+        else
+        {
+            mLines.back().emplace_back(Glyph(chr, PaletteIndex::Default));
+        }
+    }
 
-	mTextChanged = true;
-	mScrollToTop = true;
+//    mTextChanged = true;
+//    mScrollToTop = true;
 
-	mUndoBuffer.clear();
-	mUndoIndex = 0;
+//    mUndoBuffer.clear();
+//    mUndoIndex = 0;
 
-	Colorize();
+    Colorize();
 }
 
 void TextEditor::SetTextLines(const std::vector<std::string> & aLines)
@@ -2005,27 +2024,27 @@ void TextEditor::Redo(int aSteps)
 const TextEditor::Palette & TextEditor::GetDarkPalette()
 {
 	const static Palette p = { {
-			0xff7f7f7f,	// Default
-			0xffd69c56,	// Keyword	
-			0xff00ff00,	// Number
-			0xff7070e0,	// String
-			0xff70a0e0, // Char literal
-			0xffffffff, // Punctuation
-			0xff408080,	// Preprocessor
-			0xffaaaaaa, // Identifier
-			0xff9bc64d, // Known identifier
-			0xffc040a0, // Preproc identifier
-			0xff206020, // Comment (single line)
-			0xff406020, // Comment (multi line)
-			0xff101010, // Background
-			0xffe0e0e0, // Cursor
-			0x80a06020, // Selection
-			0x800020ff, // ErrorMarker
-			0x40f08000, // Breakpoint
-			0xff707000, // Line number
-			0x40000000, // Current line fill
-			0x40808080, // Current line fill (inactive)
-			0x40a0a0a0, // Current line edge
+            0xff7f7f7f, // None
+            0xffd69c56, // Keyword
+            0xff00ff00, // Number
+            0xff7070e0, // String
+            0xff70a0e0, // Char literal
+            0xffffffff, // Punctuation
+            0xff408080, // Preprocessor
+            0xffaaaaaa, // Identifier
+            0xff9bc64d, // Known identifier
+            0xffc040a0, // Preproc identifier
+            0xff206020, // Comment (single line)
+            0xff406020, // Comment (multi line)
+            0xff101010, // Background
+            0xffe0e0e0, // Cursor
+            0x80a06020, // Selection
+            0x800020ff, // ErrorMarker
+            0x40f08000, // Breakpoint
+            0xff707000, // Line number
+            0x40000000, // Current line fill
+            0x40808080, // Current line fill (inactive)
+            0x40a0a0a0, // Current line edge
 		} };
 	return p;
 }
@@ -2803,40 +2822,40 @@ const TextEditor::LanguageDefinition& TextEditor::LanguageDefinition::CPlusPlus(
 	return langDef;
 }
 
-TextEditor::LanguageDefinition TextEditor::LanguageDefinition::Metal()
+const TextEditor::LanguageDefinition& TextEditor::LanguageDefinition::Metal()
 {
 	static bool inited = false;
 	static LanguageDefinition langDef;
 	if (!inited)
 	{
 		static const char* const keywords[] = {
-			"asm", "asm_fragment", "BlendState", "bool", "break", "case", "class",
-			"const", "constant", "device", "using", "continue", "default", "discard", "do", "double", "DomainShader", "else",
-			"export", "extern", "false", "true", "float", "for", "half", "if", "in", "inline", "inout", "InputPatch", "int",
-			"simd", "namespace", "NULL", "out",
-			"return", "register", "sampler", "shared", "snorm",
-			"static", "string", "struct", "switch", "texture",
-			"typedef", "uint", "uniform", "unorm", "unsigned",
-			"void", "volatile", "while",
-			"bool1","bool2","bool3","bool4","double1","double2","double3","double4", "float1", "float2", "float3", "float4", "int1", "int2", "int3", "int4", "in", "out", "inout",
-			"uint1", "uint2", "uint3", "uint4", "dword1", "dword2", "dword3", "dword4", "half1", "half2", "half3", "half4",
-			"float1x1","float2x1","float3x1","float4x1","float1x2","float2x2","float3x2","float4x2",
-			"float1x3","float2x3","float3x3","float4x3","float1x4","float2x4","float3x4","float4x4",
-			"half1x1","half2x1","half3x1","half4x1","half1x2","half2x2","half3x2","half4x2",
-			"half1x3","half2x3","half3x3","half4x3","half1x4","half2x4","half3x4","half4x4",
-			"buffer", "stage_in", "instance_id", "vertex_id", "texture2d", "access", "early_fragment_tests",
-			"enum",
+            "asm", "asm_fragment", "BlendState", "bool", "break", "case", "class",
+            "const", "constant", "device", "using", "continue", "default", "discard", "do", "double", "DomainShader", "else",
+            "export", "extern", "false", "true", "float", "for", "half", "if", "in", "inline", "inout", "InputPatch", "int",
+            "simd", "namespace", "NULL", "out",
+            "return", "register", "sampler", "shared", "snorm",
+            "static", "string", "struct", "switch", "texture",
+            "typedef", "uint", "uniform", "unorm", "unsigned",
+            "void", "volatile", "while",
+            "bool1","bool2","bool3","bool4","double1","double2","double3","double4", "float1", "float2", "float3", "float4", "int1", "int2", "int3", "int4", "in", "out", "inout",
+            "uint1", "uint2", "uint3", "uint4", "dword1", "dword2", "dword3", "dword4", "half1", "half2", "half3", "half4",
+            "float1x1","float2x1","float3x1","float4x1","float1x2","float2x2","float3x2","float4x2",
+            "float1x3","float2x3","float3x3","float4x3","float1x4","float2x4","float3x4","float4x4",
+            "half1x1","half2x1","half3x1","half4x1","half1x2","half2x2","half3x2","half4x2",
+            "half1x3","half2x3","half3x3","half4x3","half1x4","half2x4","half3x4","half4x4",
+            "buffer", "stage_in", "instance_id", "vertex_id", "texture2d", "access", "early_fragment_tests",
+            "enum",
 		};
 		for (auto& k : keywords)
 			langDef.mKeywords.insert(k);
 
 		static const char* const identifiers[] = {
-			"abort", "abs", "acos", "all", "any", "atan", "atan2", "ceil", "clamp", "clip", "cos", "cosh", "countbits", "cross", "ddx",
-			"ddx_coarse", "ddx_fine", "ddy", "ddy_coarse", "ddy_fine", "degrees", "determinant", "distance", "dot", "exp", "exp2",
-			"floor", "fma", "fmod", "frac", "frexp", "fwidth", "isfinite", "isinf", "isnan",
-			"ldexp", "length", "lerp", "lit", "log", "log10", "log2", "mad", "max", "min", "modf", "msad4", "mul", "noise", "normalize", "pow",
-			"radians", "rcp", "reflect", "refract", "reversebits", "round", "rsqrt", "saturate", "sign", "sin", "sincos", "sinh", "smoothstep", "sqrt", "step",
-			"tan", "tanh", "transpose", "trunc", "sample", "mix",
+            "abort", "abs", "acos", "all", "any", "atan", "atan2", "ceil", "clamp", "clip", "cos", "cosh", "countbits", "cross", "ddx",
+            "ddx_coarse", "ddx_fine", "ddy", "ddy_coarse", "ddy_fine", "degrees", "determinant", "distance", "dot", "exp", "exp2",
+            "floor", "fma", "fmod", "frac", "frexp", "fwidth", "isfinite", "isinf", "isnan",
+            "ldexp", "length", "lerp", "lit", "log", "log10", "log2", "mad", "max", "min", "modf", "msad4", "mul", "noise", "normalize", "pow",
+            "radians", "rcp", "reflect", "refract", "reversebits", "round", "rsqrt", "saturate", "sign", "sin", "sincos", "sinh", "smoothstep", "sqrt", "step",
+            "tan", "tanh", "transpose", "trunc", "sample", "mix",
 		};
 		for (auto& k : identifiers)
 		{
@@ -2845,77 +2864,7 @@ TextEditor::LanguageDefinition TextEditor::LanguageDefinition::Metal()
 			langDef.mIdentifiers.insert(std::make_pair(std::string(k), id));
 		}
 
-		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("//.*", PaletteIndex::Comment));
-		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[ \t]*#[ \\t]*[a-zA-Z_]+", PaletteIndex::Preprocessor));
-		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("L?\\\"(\\\\.|[^\\\"])*\\\"", PaletteIndex::String));
-		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("\\'\\\\?[^\\']\\'", PaletteIndex::CharLiteral));
-		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?[fF]?", PaletteIndex::Number));
-		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[+-]?[0-9]+[Uu]?[lL]?[lL]?", PaletteIndex::Number));
-		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("0[0-7]+[Uu]?[lL]?[lL]?", PaletteIndex::Number));
-		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("0[xX][0-9a-fA-F]+[uU]?[lL]?[lL]?", PaletteIndex::Number));
-		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[a-zA-Z_][a-zA-Z0-9_]*", PaletteIndex::Identifier));
-		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[\\[\\]\\{\\}\\!\\%\\^\\&\\*\\(\\)\\-\\+\\=\\~\\|\\<\\>\\?\\/\\;\\,\\.]", PaletteIndex::Punctuation));
-
-		langDef.mCommentStart = "/*";
-		langDef.mCommentEnd = "*/";
-
-		langDef.mCaseSensitive = true;
-
-		langDef.mName = "HLSL";
-
-		inited = true;
-	}
-	return langDef;
-}
-
-TextEditor::LanguageDefinition TextEditor::LanguageDefinition::HLSL()
-{
-	static bool inited = false;
-	static LanguageDefinition langDef;
-	if (!inited)
-	{
-		static const char* const keywords[] = {
-			"AppendStructuredBuffer", "asm", "asm_fragment", "BlendState", "bool", "break", "Buffer", "ByteAddressBuffer", "case", "cbuffer", "centroid", "class", "column_major", "compile", "compile_fragment",
-			"CompileShader", "const", "continue", "ComputeShader", "ConsumeStructuredBuffer", "default", "DepthStencilState", "DepthStencilView", "discard", "do", "double", "DomainShader", "dword", "else",
-			"export", "extern", "false", "float", "for", "fxgroup", "GeometryShader", "groupshared", "half", "Hullshader", "if", "in", "inline", "inout", "InputPatch", "int", "interface", "line", "lineadj",
-			"linear", "LineStream", "matrix", "min16float", "min10float", "min16int", "min12int", "min16uint", "namespace", "nointerpolation", "noperspective", "NULL", "out", "OutputPatch", "packoffset",
-			"pass", "pixelfragment", "PixelShader", "point", "PointStream", "precise", "RasterizerState", "RenderTargetView", "return", "register", "row_major", "RWBuffer", "RWByteAddressBuffer", "RWStructuredBuffer",
-			"RWTexture1D", "RWTexture1DArray", "RWTexture2D", "RWTexture2DArray", "RWTexture3D", "sample", "sampler", "SamplerState", "SamplerComparisonState", "shared", "snorm", "stateblock", "stateblock_state",
-			"static", "string", "struct", "switch", "StructuredBuffer", "tbuffer", "technique", "technique10", "technique11", "texture", "Texture1D", "Texture1DArray", "Texture2D", "Texture2DArray", "Texture2DMS",
-			"Texture2DMSArray", "Texture3D", "TextureCube", "TextureCubeArray", "true", "typedef", "triangle", "triangleadj", "TriangleStream", "uint", "uniform", "unorm", "unsigned", "vector", "vertexfragment",
-			"VertexShader", "void", "volatile", "while",
-			"bool1","bool2","bool3","bool4","double1","double2","double3","double4", "float1", "float2", "float3", "float4", "int1", "int2", "int3", "int4", "in", "out", "inout",
-			"uint1", "uint2", "uint3", "uint4", "dword1", "dword2", "dword3", "dword4", "half1", "half2", "half3", "half4",
-			"float1x1","float2x1","float3x1","float4x1","float1x2","float2x2","float3x2","float4x2",
-			"float1x3","float2x3","float3x3","float4x3","float1x4","float2x4","float3x4","float4x4",
-			"half1x1","half2x1","half3x1","half4x1","half1x2","half2x2","half3x2","half4x2",
-			"half1x3","half2x3","half3x3","half4x3","half1x4","half2x4","half3x4","half4x4",
-		};
-		for (auto& k : keywords)
-			langDef.mKeywords.insert(k);
-
-		static const char* const identifiers[] = {
-			"abort", "abs", "acos", "all", "AllMemoryBarrier", "AllMemoryBarrierWithGroupSync", "any", "asdouble", "asfloat", "asin", "asint", "asint", "asuint",
-			"asuint", "atan", "atan2", "ceil", "CheckAccessFullyMapped", "clamp", "clip", "cos", "cosh", "countbits", "cross", "D3DCOLORtoUBYTE4", "ddx",
-			"ddx_coarse", "ddx_fine", "ddy", "ddy_coarse", "ddy_fine", "degrees", "determinant", "DeviceMemoryBarrier", "DeviceMemoryBarrierWithGroupSync",
-			"distance", "dot", "dst", "errorf", "EvaluateAttributeAtCentroid", "EvaluateAttributeAtSample", "EvaluateAttributeSnapped", "exp", "exp2",
-			"f16tof32", "f32tof16", "faceforward", "firstbithigh", "firstbitlow", "floor", "fma", "fmod", "frac", "frexp", "fwidth", "GetRenderTargetSampleCount",
-			"GetRenderTargetSamplePosition", "GroupMemoryBarrier", "GroupMemoryBarrierWithGroupSync", "InterlockedAdd", "InterlockedAnd", "InterlockedCompareExchange",
-			"InterlockedCompareStore", "InterlockedExchange", "InterlockedMax", "InterlockedMin", "InterlockedOr", "InterlockedXor", "isfinite", "isinf", "isnan",
-			"ldexp", "length", "lerp", "lit", "log", "log10", "log2", "mad", "max", "min", "modf", "msad4", "mul", "noise", "normalize", "pow", "printf",
-			"Process2DQuadTessFactorsAvg", "Process2DQuadTessFactorsMax", "Process2DQuadTessFactorsMin", "ProcessIsolineTessFactors", "ProcessQuadTessFactorsAvg",
-			"ProcessQuadTessFactorsMax", "ProcessQuadTessFactorsMin", "ProcessTriTessFactorsAvg", "ProcessTriTessFactorsMax", "ProcessTriTessFactorsMin",
-			"radians", "rcp", "reflect", "refract", "reversebits", "round", "rsqrt", "saturate", "sign", "sin", "sincos", "sinh", "smoothstep", "sqrt", "step",
-			"tan", "tanh", "tex1D", "tex1D", "tex1Dbias", "tex1Dgrad", "tex1Dlod", "tex1Dproj", "tex2D", "tex2D", "tex2Dbias", "tex2Dgrad", "tex2Dlod", "tex2Dproj",
-			"tex3D", "tex3D", "tex3Dbias", "tex3Dgrad", "tex3Dlod", "tex3Dproj", "texCUBE", "texCUBE", "texCUBEbias", "texCUBEgrad", "texCUBElod", "texCUBEproj", "transpose", "trunc"
-		};
-		for (auto& k : identifiers)
-		{
-			Identifier id;
-			id.mDeclaration = "Built-in function";
-			langDef.mIdentifiers.insert(std::make_pair(std::string(k), id));
-		}
-
+        langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("//.*", PaletteIndex::Comment));
 		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("[ \\t]*#[ \\t]*[a-zA-Z_]+", PaletteIndex::Preprocessor));
 		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("L?\\\"(\\\\.|[^\\\"])*\\\"", PaletteIndex::String));
 		langDef.mTokenRegexStrings.push_back(std::make_pair<std::string, PaletteIndex>("\\'\\\\?[^\\']\\'", PaletteIndex::CharLiteral));
@@ -2933,7 +2882,7 @@ TextEditor::LanguageDefinition TextEditor::LanguageDefinition::HLSL()
 		langDef.mCaseSensitive = true;
 		langDef.mAutoIndentation = true;
 
-		langDef.mName = "HLSL";
+		langDef.mName = "Metal";
 
 		inited = true;
 	}

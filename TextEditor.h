@@ -176,7 +176,7 @@ public:
 		}
 
 		static const LanguageDefinition& CPlusPlus();
-		static const LanguageDefinition& HLSL();
+		static const LanguageDefinition& Metal();
 		static const LanguageDefinition& GLSL();
 		static const LanguageDefinition& C();
 		static const LanguageDefinition& SQL();
